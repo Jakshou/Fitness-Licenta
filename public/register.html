@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Înregistrare</title>
+  <link rel="stylesheet" href="/form.css" />
+</head>
+<body>
+  <div class="form-box">
+    <h2>Înregistrare utilizator</h2>
+
+    <form action="/register" method="POST">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Parolă" required />
+      <button type="submit">Înregistrează-te</button>
+    </form>
+
+    <div class="login-link">
+      <p>Ai deja un cont?</p>
+      <a href="/login">Login</a>
+    </div>
+  </div>
+</body>
+</html>
