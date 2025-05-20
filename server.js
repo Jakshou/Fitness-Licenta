@@ -60,25 +60,30 @@ app.get("/food-log", (req, res) => {
   const userId = req.session?.userId;
   if (!userId) return res.redirect("/login");
 
-  // TDEE-UL UTILIZATORULUI
+  // Verificare TDEE
   const userSql = "SELECT tdee FROM users WHERE id = ?";
   conn.query(userSql, [userId], (err, userResults) => {
-    if (err || userResults.length === 0) {
-      console.error(err);
+    if (err) {
+      console.error("Eroare la interogare TDEE:", err);
       return res.send("Eroare la preluarea TDEE-ului.");
     }
 
-    const tdee = userResults[0].tdee || 0;
+    // Nu există utilizator sau nu are TDEE salvat
+    if (userResults.length === 0 || !userResults[0].tdee) {
+      return res.redirect("/profile");
+    }
 
-    // ALIMENTELE CONSUMATE ASTAZI
+    const tdee = userResults[0].tdee;
+
+    // Selectăm alimentele de azi
     const sql = `
       SELECT * FROM food_log
       WHERE user_id = ? AND DATE(data) = CURDATE()
     `;
 
-    conn.query(sql, [userId], (err, results) => {
-      if (err) {
-        console.error(err);
+    conn.query(sql, [userId], (err2, results) => {
+      if (err2) {
+        console.error("Eroare la citirea jurnalului:", err2);
         return res.send("Eroare la citirea din jurnal.");
       }
 
@@ -100,7 +105,6 @@ app.get("/food-log", (req, res) => {
 
       const caloriiRamase = Math.max(0, tdee - totalKcal);
 
-      // TRIMITERE DATE IN VIEW
       res.render("food-log", {
         mese,
         totalKcal,
