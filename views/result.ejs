@@ -1,0 +1,50 @@
+<% title = "Rezultat Calcule" %>
+
+<div class="container py-5">
+  <div class="card border-primary shadow mx-auto" style="max-width: 500px">
+    <div class="card-body text-center">
+      <h3 class="card-title mb-4">Rezultatele tale</h3>
+      <p><strong>Calorii:</strong> <span id="calorii">-</span> kcal</p>
+      <p><strong>Proteine:</strong> <span id="proteine">-</span> g</p>
+      <p><strong>Carbohidrați:</strong> <span id="carbohidrati">-</span> g</p>
+      <p><strong>Grăsimi:</strong> <span id="grasimi">-</span> g</p>
+      <a href="/calculator" class="btn btn-outline-primary mt-3">
+        Calculează din nou
+      </a>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <p>Vrei să actualizăm profilul cu aceste valori?</p>
+    <form method="POST" action="/update-profil" class="d-inline-block">
+      <input type="hidden" name="varsta" id="varstaInput" />
+      <input type="hidden" name="greutate" id="greutateInput" />
+      <input type="hidden" name="scop" id="scopInput" />
+      <input type="hidden" name="activitate" id="activitateInput" />
+      <input type="hidden" name="calorii" id="caloriiInput" />
+      <input type="hidden" name="proteine" id="proteineInput" />
+      <input type="hidden" name="carbohidrati" id="carbohidratiInput" />
+      <input type="hidden" name="grasimi" id="grasimiInput" />
+      <button type="submit" class="btn btn-success">Da</button>
+    </form>
+    <a href="/dashboard" class="btn btn-secondary ms-2">Nu</a>
+  </div>
+</div>
+
+<script>
+  const p = new URLSearchParams(location.search);
+  document.getElementById("caloriiInput").value = p.get("calorii");
+  document.getElementById("proteineInput").value = p.get("proteine");
+  document.getElementById("carbohidratiInput").value = p.get("carbohidrati");
+  document.getElementById("grasimiInput").value = p.get("grasimi");
+  document.getElementById("varstaInput").value = p.get("varsta");
+  document.getElementById("greutateInput").value = p.get("greutate");
+  document.getElementById("scopInput").value = p.get("scop");
+  document.getElementById("activitateInput").value = p.get("activitate");
+
+  document.getElementById("calorii").textContent = p.get("calorii") || "-";
+  document.getElementById("proteine").textContent = p.get("proteine") || "-";
+  document.getElementById("carbohidrati").textContent =
+    p.get("carbohidrati") || "-";
+  document.getElementById("grasimi").textContent = p.get("grasimi") || "-";
+</script>

@@ -1,0 +1,126 @@
+<% title = "Jurnal Antrenamente" %>
+
+<div class="row g-4">
+  <!-- ANTRENAMENT GOL & SESIUNI DE ASTAZI -->
+  <div class="col-lg-6">
+    <div class="card shadow">
+      <div class="card-body">
+        <h4 class="mb-3">Pornește antrenament</h4>
+
+        <% if (activeSession) { %>
+          <div class="alert alert-info">
+            Ai deja o sesiune activă:
+            <strong><%= activeSession.titlu || "Antrenament" %></strong>
+            (pornit la <%= new Date(activeSession.start_time).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'}) %>).
+            <div class="mt-2 d-flex gap-2">
+              <a class="btn btn-sm btn-primary" href="/workout/<%= activeSession.id %>">Continuă sesiunea</a>
+              <form method="POST" action="/workout/<%= activeSession.id %>/close" class="m-0">
+                <button class="btn btn-sm btn-warning">Închide sesiunea</button>
+              </form>
+            </div>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/workout/start" class="row g-2">
+          <div class="col-12">
+            <input name="titlu" class="form-control" placeholder="Titlu (opțional): ex. Push AM" <%= activeSession ? 'disabled' : '' %> >
+          </div>
+          <div class="col-12 d-grid">
+            <button class="btn btn-success" <%= activeSession ? 'disabled' : '' %>>
+              Start Empty Workout
+            </button>
+          </div>
+        </form>
+
+        <hr class="my-4">
+        <h5 class="mb-2">Sesiunile de azi</h5>
+        <% if (!today || !today.length) { %>
+          <div class="text-muted">Nicio sesiune creată încă.</div>
+        <% } else { %>
+          <ul class="list-group">
+  <% today.forEach(s => { %>
+    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+      <div>
+        <strong><%= s.titlu || "Antrenament" %></strong>
+        <small class="ms-2 text-muted">
+          <%= new Date(s.start_time).toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'}) %>
+          <%= s.status === 'inchis' ? '• închis' : '' %>
+        </small>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/workout/<%= s.id %>" class="btn btn-sm btn-primary">Deschide</a>
+        <button type="button"
+        class="btn btn-sm btn-outline-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#confirmDeleteModal"
+        data-session-id="<%= s.id %>"
+        data-session-title="<%= s.titlu || 'Antrenament' %>">
+  Șterge
+</button>
+      </div>
+    </li>
+  <% }) %>
+</ul>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- EX PERSONALIZAT -->
+  <div class="col-lg-6">
+    <div class="card shadow">
+      <div class="card-body">
+        <h4 class="mb-3">Creează exercițiu personalizat</h4>
+        <form method="POST" action="/workout/custom-create" class="row g-2">
+          <div class="col-md-6"><input name="nume" class="form-control" placeholder="Nume" required></div>
+          <div class="col-md-6"><input name="grupa" class="form-control" placeholder="Grupă (ex: piept)" required></div>
+          <div class="col-12"><input name="muschi_principali" class="form-control" placeholder="Mușchi principali" required></div>
+          <div class="col-12"><input name="muschi_secundari" class="form-control" placeholder="Mușchi secundari (opțional)"></div>
+          <div class="col-12"><input name="video_url" class="form-control" placeholder="Link video (opțional)"></div>
+          <div class="col-12"><textarea name="descriere" class="form-control" placeholder="Descriere (opțional)"></textarea></div>
+          <div class="col-12 d-grid"><button class="btn btn-secondary">Salvează exercițiul</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="text-center mt-4">
+  <a href="/dashboard" class="btn btn-outline-secondary">Înapoi la Dashboard</a>
+</div>
+
+<!-- CONFIRMARE STERGERE SESIUNE DE ANTRENAMENT -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title">Ștergi sesiunea?</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Închide"></button>
+      </div>
+      <div class="modal-body">
+        Ești sigur că vrei să ștergi sesiunea <strong id="delSessionTitle">Antrenament</strong>? Acțiunea este definitivă.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+        <form id="deleteSessionForm" method="POST" action="#">
+          <button type="submit" class="btn btn-danger">Da, șterge</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const delModal = document.getElementById('confirmDeleteModal');
+  delModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const sessionId = button.getAttribute('data-session-id');
+    const title = button.getAttribute('data-session-title') || 'Antrenament';
+
+    document.getElementById('delSessionTitle').textContent = title;
+
+    const form = document.getElementById('deleteSessionForm');
+    form.action = `/workout/${sessionId}/delete`;
+  });
+</script>

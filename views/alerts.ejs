@@ -1,0 +1,41 @@
+<% const msgs = []; if (locals.success) msgs.push({ kind:'success', text:
+locals.success }); if (locals.warning) msgs.push({ kind:'warning', text:
+locals.warning }); if (locals.error) msgs.push({ kind:'error', text:
+locals.error }); const seen = new Set(); const unique = msgs.filter(m => { const
+k=m.kind+'|'+m.text; if(seen.has(k)) return false; seen.add(k); return true; });
+const cls = k =>
+({success:'text-bg-success',warning:'text-bg-warning',error:'text-bg-danger'})[k]
+|| 'text-bg-secondary'; %> <% unique.forEach(m => { %>
+<div
+  class="toast <%= cls(m.kind) %> border-0 mb-2"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+  data-bs-autohide="true"
+  data-bs-delay="4000"
+  style="pointer-events: auto; max-width: 360px"
+>
+  <div class="d-flex">
+    <div class="toast-body"><%= m.text %></div>
+    <button
+      type="button"
+      class="btn-close btn-close-white me-2 m-auto"
+      data-bs-dismiss="toast"
+      aria-label="Close"
+    ></button>
+  </div>
+</div>
+<% }) %>
+
+<script>
+  document.querySelectorAll(".toast").forEach((el) => {
+    try {
+      new bootstrap.Toast(el).show();
+    } catch (_) {}
+  });
+  if (history.replaceState) {
+    const u = new URL(location);
+    ["error", "success", "warning"].forEach((k) => u.searchParams.delete(k));
+    history.replaceState({}, "", u);
+  }
+</script>

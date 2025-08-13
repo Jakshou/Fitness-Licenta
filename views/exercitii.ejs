@@ -1,0 +1,31 @@
+<% title = "Exerciții disponibile" %>
+
+<h2 class="text-center mb-5">Exerciții pentru diferite grupe musculare</h2>
+
+<div class="row">
+  <% exercitii.forEach(ex => { %>
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card border-secondary shadow h-100">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title mb-2 fw-bold"><%= ex.nume %></h5>
+        <p class="mb-1"><strong>Grupă:</strong> <%= ex.grupa %></p>
+        <p class="mb-1">
+          <strong>Mușchi principali:</strong> <%= ex.muschi_principali %>
+        </p>
+        <p class="mb-1">
+          <strong>Mușchi secundari:</strong> <%= ex.muschi_secundari %>
+        </p>
+        <p class="text-muted small flex-grow-1 mt-2"><%= ex.descriere %></p>
+
+        <div class="ratio ratio-16x9 mt-3">
+          <iframe
+            src="<%= ex.video_url.replace('watch?v=', 'embed/') %>"
+            allowfullscreen
+            class="rounded"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% }) %>
+</div>

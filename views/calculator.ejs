@@ -1,0 +1,88 @@
+<% title = "Calculator Macronutrienți" %>
+
+<div class="container py-5">
+  <h2 class="text-center mb-4">Calculator Macronutrienți</h2>
+
+  <form
+    action="/calculator"
+    method="POST"
+    class="bg-dark p-4 rounded shadow-lg mx-auto"
+    style="max-width: 600px"
+  >
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="varsta" class="form-label">Vârstă</label>
+        <input
+          type="number"
+          class="form-control"
+          name="varsta"
+          id="varsta"
+          required
+        />
+      </div>
+      <div class="col-md-6">
+        <label for="sex" class="form-label">Sex</label>
+        <select class="form-select" name="sex" id="sex" required>
+          <option value="">Alege...</option>
+          <option value="M">Masculin</option>
+          <option value="F">Feminin</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="inaltime" class="form-label">Înălțime (cm)</label>
+        <input
+          type="number"
+          class="form-control"
+          name="inaltime"
+          id="inaltime"
+          required
+        />
+      </div>
+      <div class="col-md-6">
+        <label for="greutate" class="form-label">Greutate (kg)</label>
+        <input
+          type="number"
+          class="form-control"
+          name="greutate"
+          id="greutate"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="activitate" class="form-label">Nivel de activitate</label>
+      <select class="form-select" name="activitate" id="activitate" required>
+        <option value="">Alege...</option>
+        <option value="sedentar">Sedentar</option>
+        <option value="usor">Activitate ușoară (1-2 zile/săpt)</option>
+        <option value="moderat">Moderată (3-4 zile/săpt)</option>
+        <option value="activ">Activ (5-6 zile/săpt)</option>
+        <option value="foarte activ">Foarte activ (zilnic / sportiv)</option>
+      </select>
+    </div>
+
+    <div class="mb-4">
+      <label for="scop" class="form-label">Scop</label>
+      <select class="form-select" name="scop" id="scop" required>
+        <option value="">Alege...</option>
+        <option value="slabire">Slăbire</option>
+        <option value="mentinere">Menținere</option>
+        <option value="masa">Masă musculară</option>
+      </select>
+    </div>
+
+    <div class="d-grid">
+      <button type="submit" class="btn btn-primary btn-lg">Calculează</button>
+    </div>
+  </form>
+
+  <div class="text-center mt-4">
+    <a href="/dashboard" class="btn btn-outline-secondary"
+      >Înapoi la Dashboard</a
+    >
+  </div>
+</div>

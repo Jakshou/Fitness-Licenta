@@ -1,0 +1,397 @@
+<% title = (session.titlu || "Antrenament") %>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card shadow h-100">
+      <div class="card-body">
+        <h4 class="mb-3">Exerciții în sesiune</h4>
+
+        <!-- ADAUGARE EX -->
+        <form
+          method="POST"
+          action="/workout/<%= session.id %>/add-exercise-global"
+          class="row g-2 mb-3"
+        >
+          <div class="col-12">
+            <select name="exercitiu_id" class="form-select" required>
+              <option value="">Alege exercițiul...</option>
+              <% (globalEx || []).forEach(ex => { %>
+              <option value="<%= ex.id %>"><%= ex.nume %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-6">
+            <input
+              type="number"
+              name="ord"
+              class="form-control"
+              placeholder="Ordine"
+              min="1"
+            />
+          </div>
+          <div class="col-6 d-grid">
+            <button class="btn btn-primary">Adaugă exercițiul</button>
+          </div>
+        </form>
+
+        <!-- ADAUGARE EX CUSTOM -->
+        <form
+          method="POST"
+          action="/workout/<%= session.id %>/add-exercise-custom"
+          class="row g-2"
+        >
+          <div class="col-12">
+            <select name="custom_id" class="form-select" required>
+              <option value="">Alege exercițiu personalizat...</option>
+              <% (customEx || []).forEach(ex => { %>
+              <option value="<%= ex.id %>"><%= ex.nume %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-6">
+            <input
+              type="number"
+              name="ord"
+              class="form-control"
+              placeholder="Ordine"
+              min="1"
+            />
+          </div>
+          <div class="col-6 d-grid">
+            <button class="btn btn-secondary">Adaugă custom</button>
+          </div>
+        </form>
+
+        <hr class="my-4" />
+
+        <div
+          id="session-root"
+          data-rest="<%- JSON.stringify(session && session.rest_seconds ? Number(session.rest_seconds) : 60) %>"
+        ></div>
+
+        <!-- CONTROALE PAUZA -->
+        <div class="card mb-3">
+          <div
+            class="card-body d-flex align-items-center justify-content-between flex-wrap"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <div class="h5 m-0">Pauză seturi</div>
+              <form
+                class="d-flex align-items-center gap-2"
+                method="POST"
+                action="/workout/<%= session.id %>/rest"
+              >
+                <input
+                  type="number"
+                  name="rest_seconds"
+                  class="form-control form-control-sm"
+                  value="<%= session.rest_seconds || 60 %>"
+                  min="10"
+                  max="600"
+                  style="width: 110px"
+                />
+                <button class="btn btn-sm btn-outline-info" type="submit">
+                  Salvează
+                </button>
+              </form>
+            </div>
+
+            <div class="text-end mt-2 mt-sm-0">
+              <div class="display-6" id="restDisplay">00:00</div>
+              <div class="progress mt-2" style="height: 8px">
+                <div class="progress-bar" id="restBar" style="width: 0%"></div>
+              </div>
+              <div class="mt-2 d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm btn-secondary" id="btnStart">
+                  Start
+                </button>
+                <button class="btn btn-sm btn-warning" id="btnPause">
+                  Pauză
+                </button>
+                <button class="btn btn-sm btn-outline-light" id="btnReset">
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA EX SESIUNE -->
+        <% if (!wex || !wex.length) { %>
+        <div class="text-muted">Încă nu ai exerciții în acest antrenament.</div>
+        <% } else { %>
+        <ul class="list-group">
+          <% wex.forEach(x => { %>
+          <li class="list-group-item bg-transparent">
+            <strong><%= x.nume_cache %></strong>
+
+            <!-- ADAUGARE SET -->
+            <form
+              method="POST"
+              action="/workout/<%= session.id %>/add-set"
+              class="row g-2 mt-2"
+            >
+              <input type="hidden" name="wex_id" value="<%= x.wex_id %>" />
+              <div class="col-4">
+                <input
+                  type="number"
+                  name="set_number"
+                  class="form-control"
+                  placeholder="Set #"
+                  min="1"
+                  required
+                />
+              </div>
+              <div class="col-4">
+                <input
+                  type="number"
+                  name="reps"
+                  class="form-control"
+                  placeholder="Repetări"
+                  min="1"
+                  required
+                />
+              </div>
+              <div class="col-4">
+                <input
+                  type="number"
+                  name="kg"
+                  class="form-control"
+                  step="0.5"
+                  placeholder="Kg"
+                  min="0"
+                  required
+                />
+              </div>
+              <div class="col-12 d-grid">
+                <button class="btn btn-success">Adaugă set</button>
+              </div>
+            </form>
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                document
+                  .querySelectorAll(
+                    'form[action*="/workout/<%= session.id %>/add-set"]'
+                  )
+                  .forEach(function (form) {
+                    form.addEventListener("submit", function () {
+                      // REPORNIRE TIMER
+                      sessionStorage.setItem(
+                        "ft_start_timer_after_reload",
+                        "1"
+                      );
+                    });
+                  });
+              });
+            </script>
+
+            <!-- SETURI EXISTENTE -->
+            <table class="table table-sm mt-2">
+              <thead>
+                <tr>
+                  <th>Set</th>
+                  <th>Reps</th>
+                  <th>Kg</th>
+                  <th class="text-end">Acțiuni</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% (sets || []).filter(s => s.workout_exercise_id ===
+                x.wex_id).forEach(s => { %>
+                <tr>
+                  <td><%= s.set_number %></td>
+                  <td><%= s.reps %></td>
+                  <td><%= s.kg %></td>
+                  <td class="text-end">
+                    <form
+                      method="POST"
+                      action="/workout/<%= session.id %>/set/<%= s.id %>/delete"
+                      onsubmit="return confirm('Sigur ștergi setul #<%= s.set_number %>?');"
+                    >
+                      <button class="btn btn-sm btn-outline-danger">
+                        Șterge
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </li>
+          <% }) %>
+        </ul>
+        <% } %>
+
+        <form
+          method="POST"
+          action="/workout/<%= session.id %>/close"
+          class="mt-4 d-grid"
+        >
+          <button class="btn btn-warning">Închide antrenamentul</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card shadow h-100">
+      <div class="card-body">
+        <h4 class="mb-3"><%= session.titlu || "Antrenament" %></h4>
+        <div class="text-muted">
+          Pornit la: <%= new Date(session.start_time).toLocaleString('ro-RO') %>
+        </div>
+        <% if (session.status === 'inchis') { %>
+        <div class="mt-2 text-warning">Sesiunea este închisă.</div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST PT PAUZA -->
+<div
+  class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"
+  style="z-index: 1080"
+>
+  <div
+    id="restDoneToast"
+    class="toast text-bg-success border-0"
+    role="alert"
+    data-bs-delay="4000"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const root = document.getElementById("session-root");
+    const restDisplay = document.getElementById("restDisplay");
+    const restBar = document.getElementById("restBar");
+    const btnStart = document.getElementById("btnStart");
+    const btnPause = document.getElementById("btnPause");
+    const btnReset = document.getElementById("btnReset");
+    const toastEl = document.getElementById("restDoneToast");
+
+    if (
+      !root ||
+      !restDisplay ||
+      !restBar ||
+      !btnStart ||
+      !btnPause ||
+      !btnReset
+    )
+      return;
+
+    const defaultRest = Number(root.dataset.rest || 60);
+    let total = defaultRest;
+    let left = total;
+    let timerId = null;
+    let running = false;
+
+    function fmt(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+    function render() {
+      restDisplay.textContent = fmt(left);
+      const pct = total > 0 ? ((total - left) / total) * 100 : 0;
+      restBar.style.width = (pct >= 0 && isFinite(pct) ? pct : 0) + "%";
+    }
+    function tick() {
+      if (!running) return;
+      if (left > 0) {
+        left -= 1;
+        render();
+      } else {
+        stopTimer(true);
+      }
+    }
+    function startTimer() {
+      if (running) return;
+      if (left <= 0) left = total;
+      running = true;
+      clearInterval(timerId);
+      timerId = setInterval(tick, 1000);
+    }
+    function pauseTimer() {
+      running = false;
+      clearInterval(timerId);
+      timerId = null;
+    }
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        setTimeout(() => {
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+          osc.stop();
+          ctx.close();
+        }, 500);
+      } catch (_) {}
+    }
+    function showRestDoneToast() {
+      if (!toastEl) return;
+      const t = bootstrap.Toast.getOrCreateInstance(toastEl, {
+        autohide: true,
+        delay: 4000,
+      });
+      t.show();
+    }
+    function stopTimer(finished = false) {
+      pauseTimer();
+      if (finished) {
+        restBar.classList.add("bg-success");
+        setTimeout(() => restBar.classList.remove("bg-success"), 1200);
+        showRestDoneToast();
+        playBeep();
+      }
+    }
+    function resetTimer() {
+      stopTimer();
+      total = Number(root.dataset.rest || 60);
+      left = total;
+      render();
+    }
+
+    //BUTOANE
+    btnStart.addEventListener("click", (e) => {
+      e.preventDefault();
+      startTimer();
+    });
+    btnPause.addEventListener("click", (e) => {
+      e.preventDefault();
+      pauseTimer();
+    });
+    btnReset.addEventListener("click", (e) => {
+      e.preventDefault();
+      resetTimer();
+    });
+
+    //PORNIRE AUTO DUPA ADAUGAREA UNUI SET
+    document.body.addEventListener("submit", (ev) => {
+      const form = ev.target;
+      if (form.matches('form[action*="/workout/<%= session.id %>/add-set"]')) {
+        sessionStorage.setItem("rest_auto_start", "1");
+      }
+    });
+
+    if (sessionStorage.getItem("rest_auto_start") === "1") {
+      sessionStorage.removeItem("rest_auto_start");
+      total = Number(root.dataset.rest || 60);
+      left = total;
+      render();
+      startTimer();
+    } else {
+      render();
+    }
+  });
+</script>

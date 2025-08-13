@@ -1,0 +1,33 @@
+<% title = "Check-in" %>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3 class="m-0">Check-in (ultimele 30 zile)</h3>
+  <a href="/workout-log" class="btn btn-outline-light">Deschide antrenament</a>
+</div>
+
+<% if (!days || days.length === 0) { %>
+<div class="alert alert-info">
+  Încă nu ai check-in-uri în ultimele 30 de zile.
+</div>
+<% } else { %>
+<div class="list-group">
+  <% days.forEach(d => { %>
+  <div
+    class="list-group-item d-flex align-items-center justify-content-between"
+  >
+    <div>
+      <strong
+        ><%= new Date(d.zi).toLocaleDateString('ro-RO', { weekday:'long',
+        day:'2-digit', month:'2-digit', year:'numeric' }) %></strong
+      >
+      <div class="text-muted small">Sesiuni: <%= d.sesiuni %></div>
+    </div>
+    <span class="badge bg-primary rounded-pill"><%= d.minute %> min</span>
+  </div>
+  <% }) %>
+</div>
+<% } %>
+
+<div class="text-center mt-4">
+  <a href="/dashboard" class="btn btn-outline-secondary">Înapoi la Dashboard</a>
+</div>
