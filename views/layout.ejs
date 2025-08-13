@@ -26,8 +26,7 @@
     />
 
     <!-- CSS Custom -->
-    <link rel="stylesheet" href="/css/modern.css?">
-
+    <link rel="stylesheet" href="/css/modern.css" />
   </head>
 
   <body>
@@ -51,25 +50,50 @@
             %>
 
             <li class="nav-item">
-  <a href="/calculator" class="nav-link <%= routePath==='/calculator' ? 'active' : '' %>">Calculator</a>
-</li>
+              <a
+                href="/calculator"
+                class="nav-link <%= routePath==='/calculator' ? 'active' : '' %>"
+                >Calculator</a
+              >
+            </li>
             <li class="nav-item">
-  <a href="/exercitii" class="nav-link <%= routePath==='/exercitii' ? 'active' : '' %>">Exerciții</a>
-</li>
+              <a
+                href="/exercitii"
+                class="nav-link <%= routePath==='/exercitii' ? 'active' : '' %>"
+                >Exerciții</a
+              >
+            </li>
 
             <% if (_isAuth) { %>
             <li class="nav-item">
-  <a href="/food-log" class="nav-link <%= routePath==='/food-log' ? 'active' : '' %>">Jurnal Nutriție</a>
-</li>
-            <li class="nav-item">
-  <a href="/workout-log" class="nav-link <%= routePath==='/workout-log' ? 'active' : '' %>">Antrenamente</a>
-</li>
-            <li class="nav-item">
-  <a href="/profile" class="nav-link <%= routePath==='/profile' ? 'active' : '' %>">Profil</a>
-</li>
-            <li class="nav-item">
-              <a class="nav-link text-danger" href="/logout">Logout</a>
+              <a
+                href="/food-log"
+                class="nav-link <%= routePath==='/food-log' ? 'active' : '' %>"
+                >Jurnal Nutriție</a
+              >
             </li>
+            <li class="nav-item">
+              <a
+                href="/workout-log"
+                class="nav-link <%= routePath==='/workout-log' ? 'active' : '' %>"
+                >Antrenamente</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="/profile"
+                class="nav-link <%= routePath==='/profile' ? 'active' : '' %>"
+                >Profil</a
+              >
+            </li>
+            <li class="nav-item">
+              <form action="/logout" method="POST" class="d-inline">
+                <button class="nav-link btn btn-link text-danger">
+                  Logout
+                </button>
+              </form>
+            </li>
+
             <% } else { %> <% if (_path !== '/login') { %>
             <li class="nav-item">
               <a class="nav-link" href="/login">Login</a>
